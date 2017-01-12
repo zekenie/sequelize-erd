@@ -1,0 +1,19 @@
+{
+  "name": "sequelize-erd",
+  "version": "1.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sequelize": "^3.29.0"
+  },
+  "devDependencies": {
+    "pg": "^6.1.2",
+    "pg-native": "^1.10.0"
+  }
+}
