@@ -1,9 +1,8 @@
-const Sequelize = require('sequelize');
 const Vis = require('./graphvis');
-
+let Sequelize;
 const relationship = ({source, target, associationType, as}) => {
   const typeString = {
-    HasMany: `[arrowtail=odot, arrowhead=crow, dir=both]`,
+    BelongsTo: `[arrowtail=crow, arrowhead=odot, dir=both]`,
     BelongsToMany: `[arrowtail=crow, arrowhead=crow, dir=both, label="${as}"]`,
   }[associationType];
   if (typeString) {
@@ -11,8 +10,7 @@ const relationship = ({source, target, associationType, as}) => {
   }
 }
 
-const typeName = columnType => {
-  // not currently working in all versions of sequelize
+const typeName = (columnType) => {
   for(let name in Sequelize.DataTypes) {
     let type = Sequelize.DataTypes[name];
     if(columnType instanceof type && name !== 'ABSTRACT') {
@@ -21,14 +19,15 @@ const typeName = columnType => {
   }
 }
 
-const attributeTemplate = attribute => `${attribute.fieldName}\\l\\`; //:${typeName(attribute.type)}
+const attributeTemplate = attribute => `${attribute.fieldName} :${typeName(attribute.type)}\\l\\`;
 
 const modelTemplate = model => `"${model.name}" [shape=record, label="{${model.name}|\
       ${Object.values(model.attributes).map(attributeTemplate).join('\n')}
     }"]`;
 
 module.exports = path => {
-  const db = require(path);
+  const db = typeof path === 'string' ? require(path) : path;
+  Sequelize = db.constructor;
   const models = Object.values(db.models);
   return Vis(`
     digraph models_diagram {
@@ -39,4 +38,4 @@ module.exports = path => {
     format: 'svg',
     engine: 'dot'
   });
-}
+};

@@ -1,0 +1,17 @@
+#!/usr/bin/env node --harmony
+
+const program = require('commander');
+const sequelizeErd = require('../');
+const { writeFileSync } = require('fs');
+const { join } = require('path');
+
+program
+  .version('1.0.7')
+  .option('-s, --source <path>', 'path to a file that exports a sequelize instance')
+  .option('-d, --destination <path>', 'path to a location to save the ERD diagram', './erd.svg')
+  .parse(process.argv);
+
+const svg = sequelizeErd(join(process.cwd(), program.source));
+writeFileSync(program.destination, svg);
+
+setTimeout(() => process.exit(0), 800);

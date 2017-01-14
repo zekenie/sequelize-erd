@@ -1,18 +1,21 @@
 {
   "name": "sequelize-erd",
-  "version": "1.0.1",
+  "version": "1.0.7",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "bin": {
+    "sequelize-erd": "./bin/generate"
   },
+  "scripts": {},
   "keywords": [],
-  "author": "",
+  "author": "Zeke Nierenberg <hampzan09@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "sequelize": "^3.29.0"
+    "commander": "^2.9.0",
+    "pre-commit": "^1.2.2"
   },
   "devDependencies": {
+    "sequelize": "^3.29.0",
     "pg": "^6.1.2",
     "pg-native": "^1.10.0"
   }
