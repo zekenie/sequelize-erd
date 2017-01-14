@@ -2,7 +2,7 @@
 
 This package takes your sequelize models and produces ERD diagrams of them.
 
-![Example](sample.svg)
+![Example](sample.png)
 
 It should be noted that the implimentation is a bit hacky. Its built on top of [mdaines](https://github.com/mdaines)'s [vis.js](https://github.com/mdaines/viz.js/) which is described as "a hack to put Graphvis on the web." It seems like it was recently taken off NPM, so it isn't included as a dependency but instead in this package.
 
