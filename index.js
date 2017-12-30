@@ -8,16 +8,21 @@ const relationship = ({source, target, associationType, as}) => {
   if (typeString) {
     return `"${source.name}" -> "${target.name}" ${typeString}`;
   }
-}
+};
 
 const typeName = (columnType) => {
   for(let name in Sequelize.DataTypes) {
     let type = Sequelize.DataTypes[name];
+
+    if(typeof columnType === 'string') {
+        return columnType;
+      }
+
     if(columnType instanceof type && name !== 'ABSTRACT') {
       return name;
     }
   }
-}
+};
 
 const attributeTemplate = attribute => `${attribute.fieldName} :${typeName(attribute.type)}\\l\\`;
 
