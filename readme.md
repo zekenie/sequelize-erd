@@ -18,9 +18,21 @@ $ npm install sequelize-erd --save-dev
 
 Exported from `sequelize-erd` is a function which takes your models. It can either take the `sequelize` instance or a path to a file to require. The function returns an svg of the models.
 
+```
+const db = new Sequelize();
+// Import DB models here
+
+const svg = sequelizeErd(db);
+writeFileSync('./erd.svg', svg);
+
+// Writes erd.svg to local path with SVG file from your Sequelize models
+```
+
 ## Use as a git hook
 
 We expose a binary for you to use as a npm script. If you want an erd diagram generated in your project folder every time you commit, add this to your package json.
+
+The source path must export your Sequelize DB instance.
 
 ```json
 {
