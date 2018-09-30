@@ -22,25 +22,29 @@ Exported from `sequelize-erd` is a function which takes your models. It can eith
 const db = new Sequelize();
 // Import DB models here
 
-const svg = sequelizeErd(db);
+const svg = sequelizeErd({ source: db });
 writeFileSync('./erd.svg', svg);
 
 // Writes erd.svg to local path with SVG file from your Sequelize models
 ```
 
-## Use as a git hook
+## From bash
+
+### Options
+
+- `source` relative path from project root to js file containing sequelize object with models loaded
+- `destination` Where you want your ERD SVG
+- `include` Only include the following models
+- `exclude` Exclude the following models
 
 We expose a binary for you to use as a npm script. If you want an erd diagram generated in your project folder every time you commit, add this to your package json.
 
-The source path must export your Sequelize DB instance.
+The source path specifies a js file that must export your Sequelize DB instance. It also needs to load all your models.
 
 ```json
 {
   "scripts": {
     "erd": "sequelize-erd --source ./path/to/your/sequelize/instance --destination ./erd.svg"
-  },
-  "pre-commit": ["erd"]
+  }
 }
 ```
-
-The `pre-commit` part works because this package depends on [pre-commit](https://github.com/observing/pre-commit).

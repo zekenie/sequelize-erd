@@ -9,9 +9,13 @@ program
   .version('1.0.7')
   .option('-s, --source <path>', 'path to a file that exports a sequelize instance')
   .option('-d, --destination <path>', 'path to a location to save the ERD diagram', './erd.svg')
+  .option('-o, --omit <list>', 'a comma separated list of models to omit')
+  .option('-i, --include <list>', 'a comma separated list of models to include')
   .parse(process.argv);
 
-const svg = sequelizeErd(join(process.cwd(), program.source));
+program.source = join(process.cwd(), program.source);
+
+const svg = sequelizeErd(program);
 writeFileSync(program.destination, svg);
 
 setTimeout(() => process.exit(0), 800);
