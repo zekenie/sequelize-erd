@@ -11,11 +11,18 @@ program
   .option('-d, --destination <path>', 'path to a location to save the ERD diagram', './erd.svg')
   .option('-o, --omit <list>', 'a comma separated list of models to omit')
   .option('-i, --include <list>', 'a comma separated list of models to include')
+  .option('-f, --format <format>', '"svg", "dot", "xdot", "plain", "plain-ext", "ps", "ps2", "json", "json0"')
+  .option('-e, --engine <engine>', '"circo", "dot", "fdp", "neato", "osage", "twopi"')
+  .option('-c, --columns <bool>', 'do you want to include db columns in the diagram')
+  .option('-a, --associations <list>', 'list of tables to include associtaions from')
   .parse(process.argv);
 
 program.source = join(process.cwd(), program.source);
-
-const svg = sequelizeErd(program);
-writeFileSync(program.destination, svg);
-
-setTimeout(() => process.exit(0), 800);
+sequelizeErd(program)
+  .then(svg => {
+    writeFileSync(program.destination, svg);
+    setTimeout(() => process.exit(0), 800);
+  }).catch(e => {
+    console.error(e);
+    process.exit(1);
+  });

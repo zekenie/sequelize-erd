@@ -36,6 +36,8 @@ writeFileSync('./erd.svg', svg);
 - `destination` Where you want your ERD SVG
 - `include` Only include the following models
 - `exclude` Exclude the following models
+- `format` File format. Options are "svg", "dot", "xdot", "plain", "plain-ext", "ps", "ps2", "json", "json0"
+- `engine` Layout engine to use, options are "circo", "dot", "fdp", "neato", "osage", "twopi". Default to "circo"
 
 We expose a binary for you to use as a npm script. If you want an erd diagram generated in your project folder every time you commit, add this to your package json.
 
