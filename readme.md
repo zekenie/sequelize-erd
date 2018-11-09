@@ -19,13 +19,16 @@ $ npm install sequelize-erd --save-dev
 Exported from `sequelize-erd` is a function which takes your models. It can either take the `sequelize` instance or a path to a file to require. The function returns an svg of the models.
 
 ```
+(async function(){
+const {writeFileSync} = require('fs');
 const db = new Sequelize();
 // Import DB models here
 
-const svg = sequelizeErd({ source: db });
+const svg = await sequelizeErd({ source: db });
 writeFileSync('./erd.svg', svg);
 
 // Writes erd.svg to local path with SVG file from your Sequelize models
+})()
 ```
 
 ## From bash
