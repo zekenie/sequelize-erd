@@ -28,9 +28,9 @@ Artist.hasOne(ArtistInfo);
 // exported just in case, but can also be fetched via db.model('Album') etc.
 
 module.exports = {
-  Album: Album,
-  Song: Song,
-  Artist: Artist,
-  Playlist: Playlist
+  Album,
+  Song,
+  Artist,
   ArtistInfo,
+  Playlist
 };
