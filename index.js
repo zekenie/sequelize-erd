@@ -2,14 +2,58 @@ const Vis = require("./graphvis");
 const { Module, render } = require("./visRenderer");
 
 let Sequelize;
-const relationship = ({ source, target, associationType, as }) => {
-  const typeString = {
-    BelongsTo: `[arrowtail=crow, arrowhead=none, dir=both, arrowsize=0.60]`,
-    BelongsToMany: `[arrowtail=crow, arrowhead=crow, dir=both, arrowsize=0.60]`
-  }[associationType];
-  if (typeString) {
-    return `"${source.name}" -> "${target.name}" ${typeString}`;
-  }
+
+const relationships = associations => {
+  const mappings = [];
+
+  const mapper = {
+    associationTypes: new Map([
+      ['BelongsToMany', { typeArrowShapes: ['none', 'crow'], items: [] }],
+      ['BelongsTo', { typeArrowShapes: ['crow', 'none'], items: [] }],
+      ['HasMany', { typeArrowShapes: ['none', 'crow'], items: [] }],
+      ['HasOne', { typeArrowShapes: ['none', 'none'], items: [] }],
+    ]),
+  };
+
+  // Separation of association by type to process in the right order
+  associations.forEach(association =>
+    mapper.associationTypes
+      .get(association.associationType)
+      .items.push(association),
+  );
+
+  mapper.associationTypes.forEach(associationType => {
+    associationType.items.forEach(association => {
+      const modelNames = [
+        association.source.name,
+        association.through
+          ? association.through.model.name
+          : association.target.name,
+      ];
+
+      const typeMapping = {
+        [modelNames[0]]: associationType.typeArrowShapes[0],
+        [modelNames[1]]: associationType.typeArrowShapes[1],
+      };
+
+      const thisMapping = mappings.filter(
+        mapping => mapping[modelNames[0]] && mapping[modelNames[1]],
+      );
+
+      if (thisMapping.length === 0) mappings.push(typeMapping);
+      else {
+        thisMapping[0][modelNames[0]] = typeMapping[modelNames[0]];
+        thisMapping[0][modelNames[1]] = typeMapping[modelNames[1]];
+      }
+    });
+  });
+
+  return mappings
+    .map(Object.entries)
+    .map(
+      entries =>
+        `"${entries[0][0]}" -> "${entries[1][0]}" [arrowtail=${entries[0][1]}, arrowhead=${entries[1][1]}, dir=both, arrowsize=0.60]`,
+    );
 };
 
 const typeName = columnType => {
@@ -111,6 +155,16 @@ function generateDot({ models, associations, columns = true }) {
 
   modelsArr = Object.values(models);
 
+  const associationsArr = [];
+  modelsArr.map(model =>
+    associationsArr.push(...Object.values(model.associations).filter(
+      association =>
+        !!models[association.source.name] &&
+        !!models[association.target.name] &&
+        matchesAssociation(association)
+    )),
+  );
+
   if (!modelsArr.length) {
     console.error(
       `⚠️   Oops! It looks like \`sequelize-erd\` can't see your models. Make sure your source file exports sequelize *and* requires your models`
@@ -135,19 +189,7 @@ function generateDot({ models, associations, columns = true }) {
       .filter(modelFilter)
       .map(model => modelTemplate({ model, columns }))
       .join("\n")}
-    ${modelsArr
-      .map(model =>
-        Object.values(model.associations)
-          .filter(
-            association =>
-              !!models[association.source.name] &&
-              !!models[association.target.name] &&
-              matchesAssociation(association)
-          )
-          .map(relationship)
-          .join("\n")
-      )
-      .join("\n")}
+    ${relationships(associationsArr).join("\n")}
 }`;
 }
 
