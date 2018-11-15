@@ -14,8 +14,7 @@
     "commander": "^2.9.0"
   },
   "devDependencies": {
-    "pg": "^6.1.2",
-    "pg-native": "^1.10.0",
+    "sqlite3": "^4.0.4",
     "sequelize": "^3.29.0"
   },
   "repository": "git@github.com:zekenie/sequelize-erd.git"
