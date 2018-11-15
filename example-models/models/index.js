@@ -4,6 +4,7 @@
 
 const Playlist = require("./playlist");
 const Artist = require("./artist");
+const ArtistInfo = require('./artistInfo');
 const Album = require("./album");
 const Song = require("./song");
 
@@ -20,6 +21,10 @@ Song.belongsToMany(Artist, { through: "artistSong" });
 Song.belongsToMany(Playlist, { through: "playlistSong" });
 Playlist.belongsToMany(Song, { through: "playlistSong" });
 
+// HasOne example to show the correct arrow'ing in Viz
+ArtistInfo.belongsTo(Artist);
+Artist.hasOne(ArtistInfo);
+
 // exported just in case, but can also be fetched via db.model('Album') etc.
 
 module.exports = {
@@ -27,4 +32,5 @@ module.exports = {
   Song: Song,
   Artist: Artist,
   Playlist: Playlist
+  ArtistInfo,
 };
