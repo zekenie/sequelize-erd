@@ -6,7 +6,9 @@
   "bin": {
     "sequelize-erd": "./bin/generate"
   },
-  "scripts": {},
+  "scripts": {
+    "sample": "node sample.js"
+  },
   "keywords": [],
   "author": "Zeke Nierenberg <hampzan09@gmail.com>",
   "license": "ISC",
