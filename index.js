@@ -52,7 +52,9 @@ const relationships = associations => {
     .map(Object.entries)
     .map(
       entries =>
-        `"${entries[0][0]}" -> "${entries[1][0]}" [arrowtail=${entries[0][1]}, arrowhead=${entries[1][1]}, dir=both, arrowsize=0.60]`,
+      entries.length == 1
+      ? `"${entries[0][0]}" -> "${entries[0][0]}" [arrowtail=${entries[0][1]}, arrowhead=none, dir=both, arrowsize=0.60]`
+      : `"${entries[0][0]}" -> "${entries[1][0]}" [arrowtail=${entries[0][1]}, arrowhead=${entries[1][1]}, dir=both, arrowsize=0.60]`,
     );
 };
 
@@ -180,7 +182,7 @@ function generateDot({ models, associations, columns = true }) {
   }
   return `
   digraph models_diagram {
-    graph [pad="0.5", nodesep="1", ranksep="2", overlap="false"];
+    graph [pad="0.5", nodesep=".5", ranksep="2", overlap="false"];
     edge [concentrate=true, color=gray76, penwidth=0.75];
     node[fontsize=10];
     ${columns ? "" : "esep=1;"}
