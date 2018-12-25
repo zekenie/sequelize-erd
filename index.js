@@ -183,7 +183,7 @@ function generateDot({ models, associations, columns = true }) {
   return `
   digraph models_diagram {
     graph [pad="0.5", nodesep=".5", ranksep="2", overlap="false"];
-    edge [concentrate=true, color=gray76, penwidth=0.75];
+    edge [concentrate=true, color=black, penwidth=0.75];
     node[fontsize=10];
     ${columns ? "" : "esep=1;"}
     rankdir=LR;
