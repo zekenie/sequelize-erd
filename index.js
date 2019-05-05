@@ -37,7 +37,7 @@ const modelTemplate = ({ model, columns }) => `"${
     <tr><td bgcolor="lightblue">${model.name}</td></tr>
     ${
       columns
-        ? Object.values(model.attributes)
+        ? Object.values(model.rawAttributes)
             .map(attributeTemplate)
             .join("\n")
         : ""
