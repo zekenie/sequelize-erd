@@ -1,10 +1,9 @@
 # Sequelize ERD
-![](https://img.shields.io/github/languages/top/wwmoraes/sequelize-erd.svg)
-![](https://img.shields.io/github/repo-size/wwmoraes/sequelize-erd.svg)
-![](https://img.shields.io/github/issues/wwmoraes/sequelize-erd.svg)
-![](https://img.shields.io/david/wwmoraes/sequelize-erd.svg)
-![](https://img.shields.io/github/last-commit/wwmoraes/sequelize-erd.svg)
-![](https://img.shields.io/maintenance/yes/2018.svg)
+![](https://img.shields.io/github/languages/top/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/github/repo-size/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/github/issues/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/david/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/github/last-commit/zekenie/sequelize-erd.svg)
 
 
 This package takes your sequelize models and produces ERD diagrams of them.
