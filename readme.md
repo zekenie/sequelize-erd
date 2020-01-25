@@ -40,7 +40,7 @@ const sequelizeErd = require('sequelize-erd');
 })();
 ```
 
-You can also customize the output format, engine, [arrow shapes](https://graphviz.gitlab.io/_pages/doc/info/arrows.html), and [line colors](https://graphviz.gitlab.io/_pages/doc/info/colors.html) as well as include/exclude specific models.
+You can also customize the output format, engine, [arrow shapes](https://graphviz.gitlab.io/_pages/doc/info/arrows.html), arrow size, [line colors](https://graphviz.gitlab.io/_pages/doc/info/colors.html), and line width as well as include/exclude specific models.
 
 ```
 const svg = await sequelizeErd({
@@ -53,7 +53,9 @@ const svg = await sequelizeErd({
     HasMany: ['crow', 'inv'], // Default: ['none', 'crow']
     HasOne: ['dot', 'dot'], // Default: ['none', 'none']
   },
-  color: 'green3',
+  arrowSize: 1.2, // Default: 0.6
+  lineWidth: 1, // Default: 0.75
+  color: 'green3',  // Default: 'black'
   include: ['artist', 'song', 'album', 'artistSong'],
 }); // sequelizeErd() returns a Promise
 writeFileSync('./erd.svg', svg);
