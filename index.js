@@ -3,7 +3,7 @@ const { Module, render } = require("./visRenderer");
 
 let Sequelize;
 
-const relationships = (associations, arrowShapes = {}) => {
+const relationships = (associations, arrowShapes = {}, arrowSize = 0.6) => {
   const mappings = [];
 
   const mapper = {
@@ -73,8 +73,8 @@ const relationships = (associations, arrowShapes = {}) => {
     .map(
       entries =>
       entries.length == 1
-      ? `"${entries[0][0]}" -> "${entries[0][0]}" [arrowtail=${entries[0][1]}, arrowhead=none, dir=both, arrowsize=0.60]`
-      : `"${entries[0][0]}" -> "${entries[1][0]}" [arrowtail=${entries[0][1]}, arrowhead=${entries[1][1]}, dir=both, arrowsize=0.60]`,
+      ? `"${entries[0][0]}" -> "${entries[0][0]}" [arrowtail=${entries[0][1]}, arrowhead=none, dir=both, arrowsize=${arrowSize.toString()}]`
+      : `"${entries[0][0]}" -> "${entries[1][0]}" [arrowtail=${entries[0][1]}, arrowhead=${entries[1][1]}, dir=both, arrowsize=${arrowSize.toString()}]`,
     );
 };
 
@@ -160,7 +160,9 @@ function generateDot({
   associations,
   columns = true,
   arrowShapes = {},
+  arrowSize = 0.6,
   color = 'black',
+  lineWidth = 0.75,
 }) {
   columns = {
     true: true,
@@ -207,7 +209,7 @@ function generateDot({
   return `
   digraph models_diagram {
     graph [pad="0.5", nodesep=".5", ranksep="2", overlap="false"];
-    edge [concentrate=true, color=${color}, penwidth=0.75];
+    edge [concentrate=true, color=${color}, penwidth=${lineWidth.toString()}];
     node[fontsize=10];
     ${columns ? "" : "esep=1;"}
     rankdir=LR;
@@ -215,7 +217,7 @@ function generateDot({
       .filter(modelFilter)
       .map(model => modelTemplate({ model, columns }))
       .join("\n")}
-    ${relationships(associationsArr, arrowShapes).join("\n")}
+    ${relationships(associationsArr, arrowShapes, arrowSize).join("\n")}
 }`;
 }
 
