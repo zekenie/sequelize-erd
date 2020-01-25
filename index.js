@@ -3,15 +3,35 @@ const { Module, render } = require("./visRenderer");
 
 let Sequelize;
 
-const relationships = associations => {
+const relationships = (associations, arrowShapes = {}) => {
   const mappings = [];
 
   const mapper = {
     associationTypes: new Map([
-      ['BelongsToMany', { typeArrowShapes: ['none', 'crow'], items: [] }],
-      ['BelongsTo', { typeArrowShapes: ['crow', 'none'], items: [] }],
-      ['HasMany', { typeArrowShapes: ['none', 'crow'], items: [] }],
-      ['HasOne', { typeArrowShapes: ['none', 'none'], items: [] }],
+      ['BelongsToMany', {
+        typeArrowShapes: arrowShapes['BelongsToMany']
+          ? arrowShapes['BelongsToMany']
+          : ['none', 'crow'],
+        items: []
+      }],
+      ['BelongsTo', {
+        typeArrowShapes: arrowShapes['BelongsTo']
+          ? arrowShapes['BelongsTo']
+          : ['crow', 'none'],
+        items: []
+      }],
+      ['HasMany', {
+        typeArrowShapes: arrowShapes['HasMany']
+          ? arrowShapes['HasMany']
+          : ['none', 'crow'],
+        items: []
+      }],
+      ['HasOne', {
+        typeArrowShapes: arrowShapes['HasOne']
+          ? arrowShapes['HasOne']
+          : ['none', 'none'],
+        items: []
+      }],
     ]),
   };
 
@@ -83,7 +103,7 @@ const modelTemplate = ({ model, columns }) => `"${
     <tr><td bgcolor="lightblue">${model.name}</td></tr>
     ${
       columns
-        ? Object.values(model.attributes)
+        ? Object.values(model.rawAttributes)
             .map(attributeTemplate)
             .join("\n")
         : ""
@@ -135,7 +155,13 @@ function pickModels({ include, omit, source }) {
   return modelsObj;
 }
 
-function generateDot({ models, associations, columns = true }) {
+function generateDot({
+  models,
+  associations,
+  columns = true,
+  arrowShapes = {},
+  color = 'black',
+}) {
   columns = {
     true: true,
     false: false
@@ -157,15 +183,13 @@ function generateDot({ models, associations, columns = true }) {
 
   modelsArr = Object.values(models);
 
-  const associationsArr = [];
-  modelsArr.map(model =>
-    associationsArr.push(...Object.values(model.associations).filter(
+  const associationsArr = modelsArr.reduce((result, model) =>
+    [...result, ...Object.values(model.associations).filter(
       association =>
         !!models[association.source.name] &&
         !!models[association.target.name] &&
         matchesAssociation(association)
-    )),
-  );
+    )], []);
 
   if (!modelsArr.length) {
     console.error(
@@ -183,7 +207,7 @@ function generateDot({ models, associations, columns = true }) {
   return `
   digraph models_diagram {
     graph [pad="0.5", nodesep=".5", ranksep="2", overlap="false"];
-    edge [concentrate=true, color=black, penwidth=0.75];
+    edge [concentrate=true, color=${color}, penwidth=0.75];
     node[fontsize=10];
     ${columns ? "" : "esep=1;"}
     rankdir=LR;
@@ -191,7 +215,7 @@ function generateDot({ models, associations, columns = true }) {
       .filter(modelFilter)
       .map(model => modelTemplate({ model, columns }))
       .join("\n")}
-    ${relationships(associationsArr).join("\n")}
+    ${relationships(associationsArr, arrowShapes).join("\n")}
 }`;
 }
 
