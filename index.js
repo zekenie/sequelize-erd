@@ -3,76 +3,61 @@ const { Module, render } = require("./visRenderer");
 
 let Sequelize;
 
-const relationships = (associations, arrowShapes = {}, arrowSize = 0.6) => {
-  const mappings = [];
+const relationships = (associations, customArrowShapes = {}, arrowSize = 0.6) => {
+  const arrowShapes = Object.assign({
+    BelongsToMany: ['none', 'crow'],
+    BelongsTo: ['crow', 'none'],
+    HasMany: ['none', 'crow'],
+    HasOne: ['none', 'none'],
+  }, customArrowShapes);
 
-  const mapper = {
-    associationTypes: new Map([
-      ['BelongsToMany', {
-        typeArrowShapes: arrowShapes['BelongsToMany']
-          ? arrowShapes['BelongsToMany']
-          : ['none', 'crow'],
-        items: []
-      }],
-      ['BelongsTo', {
-        typeArrowShapes: arrowShapes['BelongsTo']
-          ? arrowShapes['BelongsTo']
-          : ['crow', 'none'],
-        items: []
-      }],
-      ['HasMany', {
-        typeArrowShapes: arrowShapes['HasMany']
-          ? arrowShapes['HasMany']
-          : ['none', 'crow'],
-        items: []
-      }],
-      ['HasOne', {
-        typeArrowShapes: arrowShapes['HasOne']
-          ? arrowShapes['HasOne']
-          : ['none', 'none'],
-        items: []
-      }],
-    ]),
-  };
+  const groupedAssociations = associations.reduce((result, association) => {
+    if (typeof result[association.associationType] === 'undefined')
+      result[association.associationType] = [association];
+    else
+      result[association.associationType] = [...result[association.associationType], association];
 
-  // Separation of association by type to process in the right order
-  associations.forEach(association =>
-    mapper.associationTypes
-      .get(association.associationType)
-      .items.push(association),
-  );
+    return result;
+  }, {});
 
-  mapper.associationTypes.forEach(associationType => {
-    associationType.items.forEach(association => {
-      const modelNames = [
-        association.source.name,
-        association.through
-          ? association.through.model.name
-          : association.target.name,
-      ];
-
-      const typeMapping = {
-        [modelNames[0]]: associationType.typeArrowShapes[0],
-        [modelNames[1]]: associationType.typeArrowShapes[1],
+  const mappings = [  // Follow this heirarchy to ensure the arrows are set up correctly, eg. HasOne specifications override BelongsTo
+    'BelongsToMany',
+    'BelongsTo',
+    'HasMany',
+    'HasOne',
+  ].reduce((mapResult, type) => {
+    (
+      typeof groupedAssociations[type] === 'undefined'
+      ? []  // If the type doesn't exist, give an empty array to skip forEach
+      : groupedAssociations[type]
+    ).forEach(association => {
+      const modelNames = {
+        source: association.source.name,
+        target: association.through ? association.through.model.name : association.target.name,
       };
 
-      const thisMapping = mappings.filter(
-        mapping => mapping[modelNames[0]] && mapping[modelNames[1]],
-      );
+      const typeMapping = {
+        [modelNames.source]: arrowShapes[type][0],
+        [modelNames.target]: arrowShapes[type][1],
+      };
 
-      if (thisMapping.length === 0) mappings.push(typeMapping);
+      const existingMapping = mapResult.find(mapping => mapping[modelNames.source] && mapping[modelNames.target]);
+      
+      if (!existingMapping) mapResult.push(typeMapping);
       else {
-        thisMapping[0][modelNames[0]] = typeMapping[modelNames[0]];
-        thisMapping[0][modelNames[1]] = typeMapping[modelNames[1]];
+        existingMapping[modelNames.source] = typeMapping[modelNames.source];
+        existingMapping[modelNames.target] = typeMapping[modelNames.target];
       }
     });
-  });
+
+    return mapResult;
+  }, []);
 
   return mappings
-    .map(Object.entries)
+    .map(Object.entries)  // Turns mappings into items like [ [sourceName, arrowShapes], [targetName, arrowShapes] ] to save a step
     .map(
-      entries =>
-      entries.length == 1
+      entries =>  // Now entries are accessed via entries[0] == [sourceName, arrowShapes] and entries[1] == [targetName, arrowShapes]
+      entries.length == 1 // If source and target names are the same (resulting in one key)
       ? `"${entries[0][0]}" -> "${entries[0][0]}" [arrowtail=${entries[0][1]}, arrowhead=none, dir=both, arrowsize=${arrowSize.toString()}]`
       : `"${entries[0][0]}" -> "${entries[1][0]}" [arrowtail=${entries[0][1]}, arrowhead=${entries[1][1]}, dir=both, arrowsize=${arrowSize.toString()}]`,
     );
