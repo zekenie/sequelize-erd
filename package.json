@@ -13,11 +13,12 @@
   "author": "Zeke Nierenberg <hampzan09@gmail.com>",
   "license": "ISC",
   "dependencies": {
-    "commander": "^2.9.0"
+    "commander": "^2.9.0",
+    "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "sqlite3": "^4.0.4",
-    "sequelize": "^3.29.0"
+    "sequelize": "^3.29.0",
+    "sqlite3": "^4.0.4"
   },
   "repository": "git@github.com:zekenie/sequelize-erd.git"
 }

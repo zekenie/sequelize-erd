@@ -1,5 +1,6 @@
 const Vis = require("./graphvis");
 const { Module, render } = require("./visRenderer");
+const { groupBy } = require('lodash');
 
 let Sequelize;
 
@@ -11,50 +12,40 @@ const relationships = (associations, customArrowShapes = {}, arrowSize = 0.6) =>
     HasOne: ['none', 'none'],
   }, customArrowShapes);
 
-  const groupedAssociations = associations.reduce((result, association) => {
-    if (typeof result[association.associationType] === 'undefined')
-      result[association.associationType] = [association];
-    else
-      result[association.associationType] = [...result[association.associationType], association];
+  const associationsByType = groupBy(associations, association => association.associationType)
 
-    return result;
-  }, {});
-
-  const mappings = [  // Follow this heirarchy to ensure the arrows are set up correctly, eg. HasOne specifications override BelongsTo
+  const diagramArrowShapes = [  // Follow this heirarchy to ensure the arrows are set up correctly, eg. HasOne specifications override BelongsTo
     'BelongsToMany',
     'BelongsTo',
     'HasMany',
     'HasOne',
-  ].reduce((mapResult, type) => {
-    (
-      typeof groupedAssociations[type] === 'undefined'
-      ? []  // If the type doesn't exist, give an empty array to skip forEach
-      : groupedAssociations[type]
-    ).forEach(association => {
+  ].reduce((result, type) => {
+    const associationsOfType = associationsByType[type] || [];
+    for (const association of associationsOfType) {
       const modelNames = {
         source: association.source.name,
         target: association.through ? association.through.model.name : association.target.name,
       };
 
-      const typeMapping = {
+      const modelArrowShapes = {
         [modelNames.source]: arrowShapes[type][0],
         [modelNames.target]: arrowShapes[type][1],
       };
 
-      const existingMapping = mapResult.find(mapping => mapping[modelNames.source] && mapping[modelNames.target]);
+      const existing = result.find(modelArrow => modelArrow[modelNames.source] && modelArrow[modelNames.target]);
       
-      if (!existingMapping) mapResult.push(typeMapping);
+      if (!existing) result.push(modelArrowShapes);
       else {
-        existingMapping[modelNames.source] = typeMapping[modelNames.source];
-        existingMapping[modelNames.target] = typeMapping[modelNames.target];
+        existing[modelNames.source] = modelArrowShapes[modelNames.source];
+        existing[modelNames.target] = modelArrowShapes[modelNames.target];
       }
-    });
+    }
 
-    return mapResult;
+    return result;
   }, []);
 
-  return mappings
-    .map(Object.entries)  // Turns mappings into items like [ [sourceName, arrowShapes], [targetName, arrowShapes] ] to save a step
+  return diagramArrowShapes
+    .map(Object.entries)  // Turns diagramArrowShapes into items like [ [sourceName, arrowShapes], [targetName, arrowShapes] ] to save a step
     .map(
       entries =>  // Now entries are accessed via entries[0] == [sourceName, arrowShapes] and entries[1] == [targetName, arrowShapes]
       entries.length == 1 // If source and target names are the same (resulting in one key)
