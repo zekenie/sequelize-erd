@@ -59,6 +59,7 @@ const svg = await sequelizeErd({
   include: ['artist', 'song', 'album', 'artistSong'],
 }); // sequelizeErd() returns a Promise
 writeFileSync('./erd.svg', svg);
+
 ```
 
 ## From bash
