@@ -1,4 +1,10 @@
 # Sequelize ERD
+![](https://img.shields.io/github/languages/top/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/github/repo-size/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/github/issues/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/david/zekenie/sequelize-erd.svg)
+![](https://img.shields.io/github/last-commit/zekenie/sequelize-erd.svg)
+
 
 This package takes your sequelize models and produces ERD diagrams of them.
 
@@ -19,16 +25,41 @@ $ npm install sequelize-erd --save-dev
 Exported from `sequelize-erd` is a function which takes your models. It can either take the `sequelize` instance or a path to a file to require. The function returns an svg of the models.
 
 ```
-(async function(){
 const {writeFileSync} = require('fs');
-const db = new Sequelize();
-// Import DB models here
+const Sequelize = require('sequelize');
+const sequelizeErd = require('sequelize-erd');
 
-const svg = await sequelizeErd({ source: db });
+(async function(){
+  const db = new Sequelize(/* Your Sequelize config object */);
+  // Import DB models here
+
+  const svg = await sequelizeErd({ source: db }); // sequelizeErd() returns a Promise
+  writeFileSync('./erd.svg', svg);
+
+  // Writes erd.svg to local path with SVG file from your Sequelize models
+})();
+```
+
+You can also customize the output format, engine, [arrow shapes](https://graphviz.gitlab.io/_pages/doc/info/arrows.html), arrow size, [line colors](https://graphviz.gitlab.io/_pages/doc/info/colors.html), and line width as well as include/exclude specific models.
+
+```
+const svg = await sequelizeErd({
+  source: db,
+  format: 'json', // See available options below
+  engine: 'circo',  // See available options below
+  arrowShapes: {  // Any of the below 4 options formatted ['startShape', 'endShape']. If excluded, the default is used.
+    BelongsToMany: ['crow', 'crow'],  // Default: ['none', 'crow']
+    BelongsTo: ['inv', 'crow'], // Default: ['crow', 'none']
+    HasMany: ['crow', 'inv'], // Default: ['none', 'crow']
+    HasOne: ['dot', 'dot'], // Default: ['none', 'none']
+  },
+  arrowSize: 1.2, // Default: 0.6
+  lineWidth: 1, // Default: 0.75
+  color: 'green3',  // Default: 'black'
+  include: ['artist', 'song', 'album', 'artistSong'],
+}); // sequelizeErd() returns a Promise
 writeFileSync('./erd.svg', svg);
 
-// Writes erd.svg to local path with SVG file from your Sequelize models
-})()
 ```
 
 ## From bash
