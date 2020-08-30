@@ -68,15 +68,21 @@ const typeName = columnType => {
   }
 };
 
+const customAttribute = (attribute) => {
+  if (attribute.primaryKey) return `<u>${attribute.fieldName}</u>`;
+  else if (attribute.references) return `<u><i>${attribute.fieldName}</i></u>`;
+  return attribute.fieldName;
+};
+
 const attributeTemplate = (attribute, i) =>
-  `<tr><td port="${i}" align="left">${attribute.fieldName}: ${typeName(
+  `<tr><td port="${i}" align="left">${customAttribute(attribute)}: ${typeName(
     attribute.type
   )}</td></tr>`;
 
 const modelTemplate = ({ model, columns }) => `"${
   model.name
 }" [shape=none, margin=0, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4">
-    <tr><td bgcolor="lightblue">${model.name}</td></tr>
+    <tr><td bgcolor="lightblue"><b>${model.name}</b></td></tr>
     ${
       columns
         ? Object.values(model.rawAttributes)
