@@ -17,7 +17,7 @@
     "lodash": "^4.17.15"
   },
   "devDependencies": {
-    "sequelize": "^3.29.0",
+    "sequelize": "^5.15.1",
     "sqlite3": "^4.0.4"
   },
   "repository": "git@github.com:zekenie/sequelize-erd.git"
